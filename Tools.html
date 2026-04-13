@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOOLS - Laboratory Management</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * { box-sizing: border-box; }
+        
+        .dashboard-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(to right, #e73523, #f3931f);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(231, 53, 35, 0.3);
+        }
+
+        .back-arrow {
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .back-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dash-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .add-btn {
+            background: white;
+            color: #e73523;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+        }
+
+        .user-icon-dash {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: box-shadow 0.3s;
+        }
+
+        .user-icon-dash:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .dashboard-content {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 100px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 1000px;
+            width: 95%;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            overflow-x: auto;
+        }
+
+        .tools-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #000;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .tools-table th {
+            background: #2d2d2d;
+            color: white;
+            padding: 20px 24px;
+            font-weight: 700;
+            border: 2px solid #000;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .tools-table td {
+            padding: 18px 24px;
+            border: 1px solid #000;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tools-table tr:hover {
+            background: #f0f8ff;
+        }
+
+        .delete-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+
+        .tools-table tr:hover .delete-btn {
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 0 16px;
+            }
+
+            .dash-title {
+                font-size: 1.2rem;
+            }
+
+            .header-right {
+                gap: 6px;
+            }
+
+            .table-container {
+                padding: 16px;
+                margin: 0 8px;
+            }
+
+            .tools-table th, .tools-table td {
+                padding: 10px 6px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="back-arrow" onclick="window.location.href='Inventory.html'">←</div>
+        <div class="dash-title">TOOLS</div>
+        <div class="header-right">
+            <button class="add-btn" onclick="addTool()">+ Add Item</button>
+            <div id="user-icon-tools" class="user-icon user-icon-dash">
+
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#2d2d2d">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-content">
+        <div class="table-container">
+            <table class="tools-table" id="toolsTable">
+                <thead>
+                    <tr>
+                        <th>ITEMS</th>
+                        <th>Last Updated</th>
+                        <th>QUANTITY</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody id="toolsTbody">
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const toolsTbody = document.getElementById('toolsTbody');
+        const toast = document.getElementById('toast');
+
+        function loadTools() {
+            const tools = JSON.parse(localStorage.getItem('tools') || '[]');
+            toolsTbody.innerHTML = '';
+            tools.forEach((item, index) => {
+                const row = toolsTbody.insertRow();
+                row.innerHTML = `
+                    <td onclick="editTool(${index})">${item.name}</td>
+                    <td onclick="editTool(${index})">${item.date}</td>
+                    <td onclick="editTool(${index})">${item.quantity}</td>
+                    <td><button class="delete-btn" onclick="deleteTool(${index}); event.stopPropagation()">🗑</button></td>
+                `;
+            });
+        }
+
+        function addTool() {
+            window.location.href = 'add-tool.html';
+        }
+
+        function editTool(index) {
+            window.location.href = `add-tool.html?edit=${index}`;
+        }
+
+        function deleteTool(index) {
+            if (confirm('Delete this tool?')) {
+                let tools = JSON.parse(localStorage.getItem('tools') || '[]');
+                tools.splice(index, 1);
+                localStorage.setItem('tools', JSON.stringify(tools));
+                loadTools();
+                showToast('Tool deleted');
+            }
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Seed defaults if empty
+        if (!localStorage.getItem('tools')) {
+            const defaultTools = [
+                {name: 'Hard Hats', date: '03/10/2026', quantity: '50', brand: 'BrandX', vendor: 'SupplierA'},
+                {name: 'Meter Sticks', date: '01/10/2026', quantity: '42', brand: 'BrandY', vendor: 'SupplierB'},
+                {name: 'Boots', date: '03/20/2026', quantity: '12', brand: 'BrandZ', vendor: 'SupplierC'},
+                {name: 'Theodolite', date: '03/16/2026', quantity: '15', brand: 'BrandW', vendor: 'SupplierD'},
+                {name: 'Surveyor tape', date: '03/19/2026', quantity: '35', brand: 'BrandV', vendor: 'SupplierE'}
+            ];
+            localStorage.setItem('tools', JSON.stringify(defaultTools));
+        }
+
+        loadTools();
+    </script>
+</body>
+</html>
