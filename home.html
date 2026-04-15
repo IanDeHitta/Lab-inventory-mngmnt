@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Laboratory Management</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <nav id="main-nav" class="visible">
+        <ul>
+        </ul>
+        <div id="user-icon" class="user-icon" onclick="toggleProfile()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </div>
+        <div id="profile-menu" class="profile-menu">
+            <div class="profile-item">
+                <span>Admin User</span>
+            </div>
+            <div class="profile-item logout-menu" onclick="logout()">
+                <span>Logout</span>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home-screen" class="screen active">
+        <div class="dashboard">
+            <div class="dashboard-grid">
+                <div class="card inventory-card" onclick="window.location.href='inventory.html'">
+                    <h2>Inventory</h2>
+                    <ul class="item-list">
+                        <li>Hard Hats (50 units)</li>
+                        <li>Meter Sticks Mix (42 units)</li>
+                        <li>Cement Tester (Good)</li>
+                        <li>Sieve Shaker (Good)</li>
+                    </ul>
+                </div>
+
+                <div class="card reports-card">
+                    <h2>Recent Reports</h2>
+                    <ul class="item-list">
+                        <li>Supply Restock</li>
+                        <li>Equipment Maintenance - Due</li>
+                        <li>Missing Tools</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
