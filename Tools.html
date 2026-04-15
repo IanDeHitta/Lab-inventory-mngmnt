@@ -126,7 +126,6 @@
             padding: 18px 24px;
             border: 1px solid #000;
             text-align: center;
-            cursor: pointer;
             position: relative;
         }
 
@@ -134,25 +133,11 @@
             background: #f0f8ff;
         }
 
-        .delete-btn {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #f44336;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: none;
-        }
-
-        .tools-table tr:hover .delete-btn {
-            display: block;
-        }
+        .edit-btn, .delete-btn { border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: all 0.2s; display: block; flex-shrink: 0; }
+        .edit-btn { background: #2196F3; color: white; }
+        .edit-btn:hover { background: #1976D2; transform: scale(1.05); }
+        .delete-btn { background: #f44336; color: white; }
+        .delete-btn:hover { background: #d32f2f; transform: scale(1.05); }
 
         .toast {
             position: fixed;
@@ -245,10 +230,10 @@
             tools.forEach((item, index) => {
                 const row = toolsTbody.insertRow();
                 row.innerHTML = `
-                    <td onclick="editTool(${index})">${item.name}</td>
-                    <td onclick="editTool(${index})">${item.date}</td>
-                    <td onclick="editTool(${index})">${item.quantity}</td>
-                    <td><button class="delete-btn" onclick="deleteTool(${index}); event.stopPropagation()">🗑</button></td>
+                    <td>${item.name}</td>
+                    <td>${item.date}</td>
+                    <td>${item.quantity}</td>
+                    <td style="display:flex;gap:5px;justify-content:flex-end;"><button class="edit-btn" onclick="editTool(${index});event.stopPropagation();">✏️</button><button class="delete-btn" onclick="deleteTool(${index});event.stopPropagation();">🗑</button></td>
                 `;
             });
         }

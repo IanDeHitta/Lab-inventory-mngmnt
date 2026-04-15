@@ -19,15 +19,37 @@
         .table-container { background: white; border-radius: 20px; padding: 32px; max-width: 1000px; width: 95%; box-shadow: 0 15px 40px rgba(0,0,0,0.15); overflow-x: auto; }
         .equip-table { width: 100%; border-collapse: collapse; font-family: 'Segoe UI', sans-serif; }
         .equip-table th { background: #2d2d2d; color: white; padding: 20px 24px; text-align: left; font-weight: 700; border: 3px solid #000; font-size: 1.1rem; }
-        .equip-table td { padding: 18px 24px; border: 1px solid #ccc; cursor: pointer; position: relative; }
+        .equip-table td { padding: 18px 24px; border: 1px solid #ccc; position: relative; }
         .equip-table tr:hover { background: #f0f8ff; }
-        .delete-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #f44336; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; display: none; }
-        .equip-table tr:hover .delete-btn { display: block; }
+.edit-btn, .delete-btn { border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: all 0.2s; display: block; flex-shrink: 0; }
+.edit-btn { background: #2196F3; color: white; }
+.edit-btn:hover { background: #1976D2; transform: scale(1.05); }
+.delete-btn { background: #f44336; color: white; }
+.delete-btn:hover { background: #d32f2f; transform: scale(1.05); }
+
         .status-select { padding: 6px 12px; border: 2px solid #ddd; border-radius: 8px; background: white; cursor: pointer; font-size: 0.9rem; min-width: 120px; }
         .status-select:focus { outline: none; border-color: #f3931f; }
         .toast { position: fixed; top: 100px; right: 20px; background: #4caf50; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transform: translateX(400px); transition: transform 0.3s; z-index: 2000; }
-        .toast.show { transform: translateX(0); }
-        @media (max-width: 768px) { .dashboard-header { padding: 0 16px; } .dash-title { font-size: 1.2rem; } .header-right { gap: 8px; } .add-btn { padding: 8px 16px; font-size: 0.8rem; } .table-container { padding: 16px; margin: 0 8px; } .equip-table th, .equip-table td { padding: 12px 8px; font-size: 0.9rem; } }
+.toast.show { transform: translateX(0); }
+
+        /* Modal Styles */
+        .modal { position: fixed; z-index: 2001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
+        .modal-content { background-color: white; margin: auto; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: modalSlideIn 0.3s ease; }
+        @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        .close { position: absolute; right: 20px; top: 15px; color: #aaa; float: right; font-size: 32px; font-weight: bold; cursor: pointer; z-index: 2002; }
+        .close:hover { color: #000; }
+        .modal h2 { margin-top: 0; color: #2d2d2d; text-align: center; }
+        .modal label { display: block; margin: 20px 0 8px; font-weight: 600; color: #333; }
+        .modal input, .modal select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s; }
+        .modal input:focus, .modal select:focus { outline: none; border-color: #f3931f; }
+        .modal-buttons { display: flex; gap: 12px; justify-content: flex-end; margin-top: 25px; }
+        .modal-buttons button { flex: 1; padding: 14px; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 16px; transition: all 0.3s; }
+        .modal-buttons button:first-child { background: linear-gradient(to right, #4caf50, #45a049); color: white; }
+        .modal-buttons button:first-child:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76,175,80,0.4); }
+        .modal-buttons button:last-child { background: #f0f0f0; color: #666; }
+        .modal-buttons button:last-child:hover { background: #e0e0e0; transform: translateY(-2px); }
+        @media (max-width: 768px) { .modal-content { width: 95%; padding: 20px; margin: 20px; } .modal-buttons { flex-direction: column; } }
+@media (max-width: 768px) { .dashboard-header { padding: 0 16px; } .dash-title { font-size: 1.2rem; } .header-right { gap: 8px; } .add-btn { padding: 8px 16px; font-size: 0.8rem; } .table-container { padding: 16px; margin: 0 8px; } .equip-table th, .equip-table td { padding: 12px 8px; font-size: 0.9rem; } .edit-btn, .delete-btn { width: 32px; height: 32px; font-size: 14px; } }
     </style>
 </head>
 <body>
@@ -66,11 +88,42 @@
         </div>
     </main>
 
-    <div id="toast" class="toast"></div>
+<div id="toast" class="toast"></div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Edit Equipment</h2>
+            <form id="editForm">
+                <input type="hidden" id="editIndex">
+                <label>Name:<br><input type="text" id="editName" required></label>
+                <label>Date:<br><input type="date" id="editDate"></label>
+                <label>Status:<br>
+                    <select id="editStatus">
+                        <option value="Good">Good</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                        <option value="For repairs">For repairs</option>
+                    </select>
+                </label>
+                <label>Manufacturer:<br><input type="text" id="editManufacturer"></label>
+                <label>Vendor:<br><input type="text" id="editVendor"></label>
+                <label>Model:<br><input type="text" id="editModel"></label>
+                <label>Warranty:<br><input type="text" id="editWarranty"></label>
+                <label>Serial No.:<br><input type="text" id="editSerial"></label>
+                <div class="modal-buttons">
+                    <button type="button" onclick="saveEdit()">Save Changes</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         const equipTbody = document.getElementById('equipTbody');
         const toast = document.getElementById('toast');
+        const editModal = document.getElementById('editModal');
+        let editingIndex = -1;
 
         function loadEquipment() {
             const equipment = JSON.parse(localStorage.getItem('equipment') || '[]');
@@ -78,16 +131,16 @@
             equipment.forEach((item, index) => {
                 const row = equipTbody.insertRow();
                 row.innerHTML = `
-                    <td onclick="editItem(${index})">${item.name}</td>
-                    <td onclick="editItem(${index})">${item.date}</td>
-                    <td onclick="editItem(${index})">
+                    <td>${item.name}</td>
+                    <td>${item.date}</td>
+                    <td>
                         <select class="status-select" onchange="updateStatus(${index}, this.value)">
                             <option ${item.status === 'Good' ? 'selected' : ''}>Good</option>
                             <option ${item.status === 'Under Maintenance' ? 'selected' : ''}>Under Maintenance</option>
                             <option ${item.status === 'For repairs' ? 'selected' : ''}>For repairs</option>
                         </select>
                     </td>
-                    <td><button class="delete-btn" onclick="deleteItem(${index});event.stopPropagation()">🗑</button></td>
+<td style="display:flex;gap:5px;justify-content:flex-end;"><button class="edit-btn" onclick="editItem(${index});event.stopPropagation();">✏️</button><button class="delete-btn" onclick="deleteItem(${index});event.stopPropagation();">🗑</button></td>
                 `;
             });
         }
@@ -97,7 +150,19 @@
         }
 
         function editItem(index) {
-            window.location.href = `add-item.html?edit=${index}`;
+            editingIndex = index;
+            const equipment = JSON.parse(localStorage.getItem('equipment') || '[]');
+            const item = equipment[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editName').value = item.name || '';
+            document.getElementById('editDate').value = item.date ? item.date.split('/').reverse().join('-') : '';
+            document.getElementById('editStatus').value = item.status || 'Good';
+            document.getElementById('editManufacturer').value = item.manufacturer || '';
+            document.getElementById('editVendor').value = item.vendor || '';
+            document.getElementById('editModel').value = item.model || '';
+            document.getElementById('editWarranty').value = item.warranty || '';
+            document.getElementById('editSerial').value = item.serial || '';
+            editModal.style.display = 'flex';
         }
 
         function deleteItem(index) {
@@ -115,6 +180,31 @@
             equipment[index].status = status;
             localStorage.setItem('equipment', JSON.stringify(equipment));
             showToast('Status updated');
+        }
+
+        function closeModal() {
+            editModal.style.display = 'none';
+            document.getElementById('editForm').reset();
+        }
+
+        function saveEdit() {
+            if (editingIndex === -1) return;
+            const equipment = JSON.parse(localStorage.getItem('equipment') || '[]');
+            const newDate = new Date().toLocaleDateString('en-GB'); // DD/MM/YY format
+            equipment[editingIndex] = {
+                name: document.getElementById('editName').value,
+                date: newDate,
+                status: document.getElementById('editStatus').value,
+                manufacturer: document.getElementById('editManufacturer').value,
+                vendor: document.getElementById('editVendor').value,
+                model: document.getElementById('editModel').value,
+                warranty: document.getElementById('editWarranty').value,
+                serial: document.getElementById('editSerial').value
+            };
+            localStorage.setItem('equipment', JSON.stringify(equipment));
+            loadEquipment();
+            closeModal();
+            showToast('Equipment updated successfully');
         }
 
         function showToast(message) {
